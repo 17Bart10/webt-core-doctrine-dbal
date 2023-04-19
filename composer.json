@@ -1,0 +1,15 @@
+{
+    "name": "htlw3r/doctrine_dbal",
+    "autoload": {
+        "psr-4": {
+            "Htlw3r\\DoctrineDbal\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Nico Zach",
+            "email": "8157@htl.rennweg.at"
+        }
+    ],
+    "require": {}
+}
