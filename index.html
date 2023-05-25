@@ -4,7 +4,33 @@
     <meta charset="UTF-8">
     <title>Rock Paper Scissors Tournament</title>
     <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            border: 1px solid black;
+        }
 
+        th, td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid black;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        td:first-child {
+            font-weight: bold;
+        }
+
+        td:nth-child(3), td:nth-child(5) {
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>

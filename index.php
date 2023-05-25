@@ -91,6 +91,13 @@ $queryBuilderPlayer
 
 $allPlayers = $queryBuilderPlayer->fetchAllAssociative();
 
+$queryBuilderSymbol = $conn->createQueryBuilder();
+$queryBuilderSymbol
+    ->select('pk_symbol_ID', 'Bezeichnung')
+    ->from('Symbol');
+
+$allSymbols = $queryBuilderSymbol->fetchAllAssociative();
+
 
 
 echo '
@@ -143,28 +150,65 @@ echo '<br><br>
         <label for="startTime">Date:</label>
         <input type="datetime-local" id="startTime" name="startTime"><br><br>
 
-        <label for="Player1">Name Player 1:</label>
-        <input type="text" id="Player1" name="Player1"><br><br>
-
-        <label for="Symbol1">Symbol played by Player 1:</label>
-        <input type="text" id="Symbol1" name="Symbol1"><br><br>
-
-        <label for="Player2">Name Player 2:</label>
-        <input type="text" id="Player2" name="Player2"><br><br>
-
-        <label for="Symbol2">Symbol played by Player 2:</label>
-        <input type="text" id="Symbol2" name="Symbol2"><br><br>
+        <label for="Player1">Name Player 1:</label>';
+        echo '<select name="Player1" id="Player1">';
+        for ($i = 0; $i < count($allPlayers); $i++) {
+            echo '<option value="' . $allPlayers[$i]["pk_player_ID"] . '">' . $allPlayers[$i]["Name"] . '</option>';
+        }
+        echo '</select>';
         
-        <label for="Winner">Winner of Round:</label>
-        <input type="text" id="Winner" name="Winner"><br><br>
+        
+        echo '
+        <br><br>
+        <label for="Symbol1">Symbol played by Player 1:</label>';
+        echo '<select name="Symbol1" id="Symbol1">';
+        for ($i = 0; $i < count($allSymbols); $i++) {
+            echo '<option value="' . $allSymbols[$i]["pk_symbol_ID"] . '">' . $allSymbols[$i]["Bezeichnung"] . '</option>';
+        }
+        echo '</select>';
 
+        echo '
+        <br><br>
+
+        <label for="Player2">Name Player 2:</label>';
+
+        echo '<select name="Player2" id="Player2">';
+        for ($i = 0; $i < count($allPlayers); $i++) {
+            echo '<option value="' . $allPlayers[$i]["pk_player_ID"] . '">' . $allPlayers[$i]["Name"] . '</option>';
+        }
+        echo '</select>';
+        
+        
+
+        echo '
+        <br><br>
+        <label for="Symbol2">Symbol played by Player 2:</label>';
+
+        echo '<select name="Symbol2" id="Symbol2">';
+        for ($i = 0; $i < count($allSymbols); $i++) {
+            echo '<option value="' . $allSymbols[$i]["pk_symbol_ID"] . '">' . $allSymbols[$i]["Bezeichnung"] . '</option>';
+        }
+        echo '</select>';
+
+        echo '
+        <br><br>
+        <label for="Winner">Winner of Round:</label>';
+
+        echo '<select name="Winner" id="Winner">';
+        for ($i = 0; $i < count($allPlayers); $i++) {
+            echo '<option value="' . $allPlayers[$i]["pk_player_ID"] . '">' . $allPlayers[$i]["Name"] . '</option>';
+        }
+        echo '</select>';
+
+        echo'
+        <br><br>
         <input type="submit" name="buttonAdd" value="Add">
     </form>';
 
 
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['delBtn'])) {
+    if (isset($_POST['delBtn']) && isset($_POST['pk_round_ID'])) {
         $roundID = $_POST['pk_round_ID'];
         deleteRound($queryBuilderRound, $roundID);
         header('Location: ' . $_SERVER['PHP_SELF']);
@@ -189,38 +233,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 function addGame($queryBuilder, $round, $allPlayers){
-    if($round[3] == 'ro') {
-        $round[3] = '2';
-    } else if($round[3] == 'pa') {
-        $round[3] = '3';
-    } else if($game[3] == 'sc') {
-        $round[3] = '1';
-    }
-    if($round[4] == 'ro') {
-        $round[4] = '2';
-    } else if($round[4] == 'pa') {
-        $round[4] = '3';
-    } else if($round[4] == 'sc') {
-        $round[4] = '1';
-    }
+    // if($round[3] == 'ro') {
+    //     $round[3] = '2';
+    // } else if($round[3] == 'pa') {
+    //     $round[3] = '3';
+    // } else if($game[3] == 'sc') {
+    //     $round[3] = '1';
+    // }
+    // if($round[4] == 'ro') {
+    //     $round[4] = '2';
+    // } else if($round[4] == 'pa') {
+    //     $round[4] = '3';
+    // } else if($round[4] == 'sc') {
+    //     $round[4] = '1';
+    // }
 
-    $p1 = playerNameToID($round[1], $allPlayers);
-    $p2 = playerNameToID($round[2], $allPlayers);
-    $w = playerNameToID($round[5], $allPlayers);
+    $time = $round[0];
+    $p1 = $round[1];
+    $p2 = $round[2];
+    $sp1 = $round[3];
+    $sp2 = $round[4];
+    $w = $round[5];
     
-
-
     $queryBuilder
         ->insert('Round')
         ->values([
-            'fk_pk_Player1' => $queryBuilder->expr()->literal($p1),
-            'fk_pk_Player2' => $queryBuilder->expr()->literal($p2),
-            'fk_pk_SymbolP1' => $round[3],
-            'fk_pk_SymbolP2' => $round[4],
-            'startTime' => $queryBuilder->expr()->literal($round[0]),
-            'fk_pk_Winner' => $queryBuilder->expr()->literal($w),
-        ])
-        ->execute();
+            'fk_pk_Player1' => $p1,
+            'fk_pk_Player2' => $p2,
+            'fk_pk_SymbolP1' => $sp1,
+            'fk_pk_SymbolP2' => $sp2,
+            'startTime' => $queryBuilder->expr()->literal($time),
+            'fk_pk_Winner' => $w,
+        ])->execute();
 }
 
 function symbolToID($symbol) {
@@ -241,7 +285,7 @@ function playerNameToID ($playerName, $allPlayers) {
 
 function deleteRound($query, $round_ID)
 {
-    echo $round_ID;
+    // echo $round_ID;
     $query
         ->delete('Round')
         ->where('pk_round_ID = :pk_round_ID')
